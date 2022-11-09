@@ -1,0 +1,15 @@
+
+pipeline:
+  corpus_builder:
+    dset_name: "findzebra"
+    subset_size: None
+    cache_dir: "./cache"
+    num_proc: 2
+    append_title: True
+    passage_length: 200
+    passage_stride: 100
+    analytics:
+      output_dir: "analytics/"
+      verbose: True
+      concatenate: False
+

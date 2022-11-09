@@ -1,0 +1,14 @@
+{
+    "version": "0.1.0",
+    "configurations": [
+        {
+            "name": "passages",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "python": "/home/santiago/miniconda3/envs/poetry_env/bin/python",
+            "cwd": "${workspaceFolder}",
+            "args": []
+        }
+    ]
+}
