@@ -61,9 +61,9 @@ RUN poetry install
 WORKDIR /app
 COPY . .
 
-EXPOSE 5960
+EXPOSE $PORT
 ENTRYPOINT /docker-entrypoint.sh $0 $@
-CMD ["uvicorn", "--reload", "--host=0.0.0.0", "--port=5960", "main:app"]
+CMD ["uvicorn", "--reload", "--host=0.0.0.0", "--port=$PORT", "main:app"]
 
 
 # 'lint' stage runs black and isort

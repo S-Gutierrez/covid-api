@@ -42,5 +42,5 @@ async def extract_title(user_request: query = Depends()):
     return {f"Country {user_request.text} -Test done Record": tests_done}
 
 
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=5049)
+# if __name__ == "__main__":
+#    uvicorn.run(app, host="0.0.0.0", port=5049)
