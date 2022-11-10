@@ -41,31 +41,6 @@ WORKDIR $PYSETUP_PATH
 COPY ./poetry.lock ./pyproject.toml ./
 RUN poetry install --only main  # respects
 
-# 'development' stage installs all dev deps and can be used to develop code.
-# For example using docker-compose to mount local volume under /app
-FROM python-base as development
-ENV FASTAPI_ENV=development
-
-# Copying poetry and venv into image
-COPY --from=builder-base $POETRY_HOME $POETRY_HOME
-COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
-
-# Copying in our entrypoint
-COPY docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod +x /docker-entrypoint.sh
-
-# venv already has runtime deps installed we get a quicker install
-WORKDIR $PYSETUP_PATH
-RUN poetry install
-
-WORKDIR /app
-COPY . .
-
-EXPOSE $PORT
-ENTRYPOINT /docker-entrypoint.sh $0 $@
-CMD ["uvicorn", "--reload", "--host=0.0.0.0", "--port=$PORT", "main:app"]
-
-
 # 'lint' stage runs black and isort
 # running in check mode means build will fail if any linting errors occur
 FROM development AS lint
@@ -83,6 +58,7 @@ CMD ["tail", "-f", "/dev/null"]
 # 'production' stage uses the clean 'python-base' stage and copyies
 # in only our runtime deps that were installed in the 'builder-base'
 FROM python-base AS production
+ARG port
 ENV FASTAPI_ENV=production
 
 COPY --from=builder-base $VENV_PATH $VENV_PATH
@@ -99,10 +75,16 @@ COPY --chown=user:user ./app /app
 USER user
 WORKDIR /app
 
+ENV PORT=$port
+
+EXPOSE $PORT
+
+
 ENTRYPOINT /docker-entrypoint.sh $0 $@
-CMD [ "gunicorn", "--worker-class uvicorn.workers.UvicornWorker",  "main:app", "--bind 0.0.0.0:$PORT"] 
+#CMD [ "gunicorn", "--worker-class uvicorn.workers.UvicornWorker",  "main:app", "--bind 0.0.0.0:$PORT"] 
 
 
+CMD uvicorn app.main:app --host 0.0.0.0 --port $PORT
 
 # Extended from poetry github discussion:
 
