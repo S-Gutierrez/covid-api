@@ -4,6 +4,7 @@
 
 # Creating a python base with shared environment variables - ENV variables explained at the end of the script.
 FROM python:3.10 AS python-base
+
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=off \
@@ -61,8 +62,6 @@ RUN poetry install
 WORKDIR /app
 COPY . .
 
-ENV $PORT
-
 EXPOSE $PORT
 ENTRYPOINT /docker-entrypoint.sh $0 $@
 CMD ["uvicorn", "--reload", "--host=0.0.0.0", "--port=$PORT", "main:app"]
@@ -102,7 +101,8 @@ USER user
 WORKDIR /app
 
 ENTRYPOINT /docker-entrypoint.sh $0 $@
-CMD [ "gunicorn", "--worker-class uvicorn.workers.UvicornWorker","--bind 0.0.0.0:$PORT" , "main:app"] 
+CMD [ "gunicorn", "--worker-class uvicorn.workers.UvicornWorker", "--host=0.0.0.0", "--port=$PORT", "main:app"]
+
 
 
 
